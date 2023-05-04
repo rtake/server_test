@@ -1,6 +1,9 @@
+const path = require('path');
 const Redis = require('ioredis');
 const express = require('express');
 const app = express();
+
+app.set('view engine', 'ejs');
 
 const redis = new Redis({
     port: 6379,
@@ -18,17 +21,21 @@ const init = async() => {
     ]);
 };
 
-app.get('/', (req, res) => {
-    res.status(200).send('hello world\n');
-});
+// app.get('/', (req, res) => {
+//     res.status(200).send('hello world\n');
+// });
 
-app.get('/user/:id', (req, res) => {
-    res.status(200).send(req.params.id);
-});
+// app.get('/user/:id', (req, res) => {
+//     res.status(200).send(req.params.id);
+// });
 
 redis.once('ready', async () => {
     try {
         await init();
+
+        app.get('/', (req, res) => {
+            res.render(path.join(__dirname, 'views', 'index.ejs'));
+        });        
 
         app.get('/user/id:', async (req, res) => {
             try {
@@ -57,7 +64,8 @@ redis.once('ready', async () => {
                         users.push(user);
                     }
                 }
-                res.status(200).json(users);
+                // res.status(200).json(users);
+                res.render(path.join(__dirname, 'views', 'users.ejs'), { users: users });
             } catch {
                 console.error(err);
                 res.status(500).send(('internal error'));
