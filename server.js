@@ -29,6 +29,8 @@ const init = async() => {
 //     res.status(200).send(req.params.id);
 // });
 
+app.use('/static', express.static(path.join(__dirname, 'public')));
+
 redis.once('ready', async () => {
     try {
         await init();
